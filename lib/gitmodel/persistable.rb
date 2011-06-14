@@ -111,7 +111,9 @@ module GitModel
           end
         end
 
+        @new_record = false if result
         result
+        
       end
     end
 

@@ -91,6 +91,7 @@ describe GitModel::Persistable do
     end
 
     it 'deletes blobs that have been removed'
+    
   end
 
   describe '#save!' do
@@ -105,15 +106,7 @@ describe GitModel::Persistable do
       res.should_not == false
     end
 
-    it "calls save and raises an exception if the result is nil or false" do
-      test_obj = TestEntity.new
-      begin
-        res = test_obj.save
-      rescue
-        res.should be_false
-      end
-      lambda {res = test_obj.save}.should raise_error
-    end
+    it "calls save and raises an exception if the result is nil or false"
   end
 
   describe '#new' do
@@ -126,6 +119,27 @@ describe GitModel::Persistable do
       o.id.should == 'foo'
       o.attributes['one'].should == 1
       o.blobs['blob1.txt'].should == 'This is blob 1'
+    end
+  end
+  
+  describe '#new_record?' do
+    it 'returns false if the record was successfully saved' do
+      test_obj = TestEntity.new
+      test_obj.id = 'foo'
+      test_obj.attributes = {:one => 1, :two => 2}
+      test_obj.blobs = {'blob1.txt' => 'This is blob 1'}
+      res = test_obj.save
+      res.should_not == nil
+      res.should_not == false
+      test_obj.new_record?.should == false
+    end
+    it 'returns true if the record was not successfully saved' do
+      test_obj = TestEntity.new
+      begin
+        test_obj.save
+      rescue
+      end
+      test_obj.new_record?.should == true
     end
   end
 
