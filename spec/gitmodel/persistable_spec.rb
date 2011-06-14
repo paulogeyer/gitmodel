@@ -4,12 +4,6 @@ class TestEntity
   include GitModel::Persistable
 end
 
-class ValidateTestEntity
-  include GitModel::Persistable
-  validates_presence_of :name
-  attribute :name
-end
-
 class LintTest < ActiveModel::TestCase
   include ActiveModel::Lint::Tests
  
@@ -84,19 +78,14 @@ describe GitModel::Persistable do
       r.blobs['blob1.txt'].should == 'This is blob 1'
     end
 
-    it 'returns false if the validations failed' do
-      testObj = ValidateTestEntity.new(:id => 'test')
-      res = testObj.save
-      res.should == false
-    end
-      
+    it 'returns false if the validations failed'
 
     it 'returns the SHA of the commit if the save was successful' do
-      testObj = TestEntity.new
-      testObj.id = 'foo'
-      testObj.attributes = {:one => 1, :two => 2}
-      testObj.blobs = {'blob1.txt' => 'This is blob 1'}
-      res = testObj.save
+      test_obj = TestEntity.new
+      test_obj.id = 'foo'
+      test_obj.attributes = {:one => 1, :two => 2}
+      test_obj.blobs = {'blob1.txt' => 'This is blob 1'}
+      res = test_obj.save
       res.class.should == String
       res.size == 40
     end
@@ -107,35 +96,24 @@ describe GitModel::Persistable do
   describe '#save!' do
 
     it "calls save and returns the non-false and non-nil result" do
-      testObj = TestEntity.new
-      testObj.id = 'foo'
-      testObj.attributes = {:one => 1, :two => 2}
-      testObj.blobs = {'blob1.txt' => 'This is blob 1'}
-      res = testObj.save
+      test_obj = TestEntity.new
+      test_obj.id = 'foo'
+      test_obj.attributes = {:one => 1, :two => 2}
+      test_obj.blobs = {'blob1.txt' => 'This is blob 1'}
+      res = test_obj.save
       res.should_not == nil
       res.should_not == false
     end
 
-    it "calls save and raises an exception if the result is nil" do
-      testObj = TestEntity.new
+    it "calls save and raises an exception if the result is nil or false" do
+      test_obj = TestEntity.new
       begin
-        res = testObj.save
+        res = test_obj.save
       rescue
-        res.should == nil
+        res.should be_false
       end
-      lambda {res = testObj.save}.should raise_error
+      lambda {res = test_obj.save}.should raise_error
     end
-    
-    it "calls save and raises an exception if the result is false" do
-      testObj = TestEntity.new
-      begin
-        res = testObj.save
-      rescue
-        res.should == false
-      end
-      lambda {res = testObj.save}.should raise_error
-    end
-
   end
 
   describe '#new' do
